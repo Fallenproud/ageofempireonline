@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
-import { Cloud, Sun, CloudRain, Zap } from "lucide-react";
+import { Sun, Cloud, CloudRain, Zap } from "lucide-react";
 import ResourceManager from '@/components/game/ResourceManager';
 import BuildingManager from '@/components/game/BuildingManager';
 import UnitManager from '@/components/game/UnitManager';
+import GameHeader from '@/components/game/GameHeader';
+import ResourceDisplay from '@/components/game/ResourceDisplay';
+import HeroSelection from '@/components/game/HeroSelection';
 
 const Index = () => {
   const { toast } = useToast();
@@ -18,11 +19,6 @@ const Index = () => {
     attackPower: 1,
     visibility: 1
   });
-
-  // Simulate loading screen
-  useEffect(() => {
-    setTimeout(() => setIsLoading(false), 2000);
-  }, []);
 
   const weatherIcons = {
     clear: {
@@ -75,23 +71,9 @@ const Index = () => {
     },
   ];
 
-  const buildingTypes = {
-    house: {
-      name: "House",
-      cost: { wood: 50, stone: 0, gold: 0 },
-      image: "/lovable-uploads/403d589d-44f6-4d9c-b003-84a5918edb71.png"
-    },
-    barracks: {
-      name: "Barracks",
-      cost: { wood: 100, stone: 50, gold: 0 },
-      image: "/lovable-uploads/06f6421b-91d9-4182-ae25-5b9824111e3b.png"
-    },
-    archeryRange: {
-      name: "Archery Range",
-      cost: { wood: 150, stone: 50, gold: 0 },
-      image: "/lovable-uploads/f1526835-ab5e-48ea-a317-4bbc731ac04a.png"
-    }
-  };
+  useEffect(() => {
+    setTimeout(() => setIsLoading(false), 2000);
+  }, []);
 
   const handleResourceUpdate = (gathered) => {
     setResources(prev => ({
@@ -109,14 +91,12 @@ const Index = () => {
     }));
   };
 
-  // Weather effect simulation
   useEffect(() => {
     const weatherTypes = ['clear', 'rain', 'fog', 'lightning'];
     const weatherInterval = setInterval(() => {
       const newWeather = weatherTypes[Math.floor(Math.random() * weatherTypes.length)];
       setWeather(newWeather);
       
-      // Update weather effects
       const effects = {
         clear: { moveSpeed: 1, attackPower: 1, visibility: 1 },
         rain: { moveSpeed: 0.7, attackPower: 0.9, visibility: 0.8 },
@@ -130,7 +110,7 @@ const Index = () => {
         title: `Weather Changed: ${weatherIcons[newWeather].label}`,
         description: weatherIcons[newWeather].description,
       });
-    }, 30000); // Weather changes every 30 seconds
+    }, 30000);
 
     return () => clearInterval(weatherInterval);
   }, []);
@@ -150,106 +130,20 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-game-secondary to-game-primary p-4">
-      {/* Game Logo Header */}
-      <div className="fixed top-0 left-0 right-0 bg-game-secondary/90 backdrop-blur p-2">
-        <img 
-          src="/lovable-uploads/aad01c13-58d2-4c99-9e7f-3d05893a467d.png" 
-          alt="Game Logo" 
-          className="h-12 object-contain mx-auto"
-        />
-      </div>
+      <GameHeader 
+        weather={weather}
+        weatherEffects={weatherEffects}
+        weatherIcons={weatherIcons}
+      />
+      
+      <ResourceDisplay resources={resources} />
+      
+      <HeroSelection
+        heroes={heroes}
+        selectedHero={selectedHero}
+        onHeroSelect={setSelectedHero}
+      />
 
-      {/* Resources Display */}
-      <div className="fixed top-16 right-4 flex gap-4">
-        <Card className="p-3 bg-opacity-90 backdrop-blur">
-          <div className="flex gap-6 text-game-accent items-center">
-            <div className="flex items-center gap-2">
-              <img 
-                src="/lovable-uploads/403d589d-44f6-4d9c-b003-84a5918edb71.png" 
-                alt="Wood" 
-                className="w-6 h-6 object-contain"
-              />
-              <span>{resources.wood}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <img 
-                src="/lovable-uploads/06f6421b-91d9-4182-ae25-5b9824111e3b.png" 
-                alt="Stone" 
-                className="w-6 h-6 object-contain"
-              />
-              <span>{resources.stone}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <img 
-                src="/lovable-uploads/f1526835-ab5e-48ea-a317-4bbc731ac04a.png" 
-                alt="Gold" 
-                className="w-6 h-6 object-contain"
-              />
-              <span>{resources.gold}</span>
-            </div>
-          </div>
-        </Card>
-      </div>
-
-      {/* Weather Display */}
-      <div className="fixed top-4 left-1/2 -translate-x-1/2">
-        <Card className="p-4 bg-opacity-90 backdrop-blur">
-          <div className="flex flex-col items-center gap-2">
-            <div className="flex items-center gap-2">
-              {React.createElement(weatherIcons[weather].icon, {
-                className: `w-6 h-6 ${weatherIcons[weather].color}`
-              })}
-              <span className="text-game-accent font-semibold">
-                {weatherIcons[weather].label}
-              </span>
-            </div>
-            <div className="text-sm text-muted-foreground">
-              {weatherIcons[weather].description}
-            </div>
-            <div className="grid grid-cols-3 gap-4 text-xs text-game-accent mt-2">
-              <div className="text-center">
-                <div>Move Speed</div>
-                <div>{Math.round(weatherEffects.moveSpeed * 100)}%</div>
-              </div>
-              <div className="text-center">
-                <div>Attack</div>
-                <div>{Math.round(weatherEffects.attackPower * 100)}%</div>
-              </div>
-              <div className="text-center">
-                <div>Visibility</div>
-                <div>{Math.round(weatherEffects.visibility * 100)}%</div>
-              </div>
-            </div>
-          </div>
-        </Card>
-      </div>
-
-      {/* Hero Selection */}
-      <div className="fixed top-32 left-4">
-        <Card className="p-4 bg-opacity-90 backdrop-blur">
-          <h2 className="text-xl mb-3 text-game-accent">Heroes</h2>
-          <div className="flex flex-col gap-2">
-            {heroes.map((hero) => (
-              <Button
-                key={hero.id}
-                variant={selectedHero?.id === hero.id ? "secondary" : "outline"}
-                className="w-full justify-start"
-                onClick={() => setSelectedHero(hero)}
-              >
-                <div className="flex items-center gap-3">
-                  <img src={hero.image} alt={hero.name} className="w-12 h-12 rounded-full object-cover" />
-                  <div className="text-left">
-                    <div>{hero.name}</div>
-                    <div className="text-sm opacity-70">{hero.bonus}</div>
-                  </div>
-                </div>
-              </Button>
-            ))}
-          </div>
-        </Card>
-      </div>
-
-      {/* Game World */}
       <div className="fixed inset-0 z-0 mt-16">
         <ResourceManager onResourceUpdate={handleResourceUpdate} />
         <BuildingManager 
@@ -262,7 +156,6 @@ const Index = () => {
         />
       </div>
 
-      {/* Game Background */}
       <div className="fixed inset-0 -z-10">
         <img 
           src="/lovable-uploads/aad01c13-58d2-4c99-9e7f-3d05893a467d.png" 
