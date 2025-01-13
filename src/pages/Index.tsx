@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { Cloud, Sun, CloudRain, Zap } from "lucide-react";
 import ResourceManager from '@/components/game/ResourceManager';
+import BuildingManager from '@/components/game/BuildingManager';
 
 const Index = () => {
   const { toast } = useToast();
@@ -100,6 +101,22 @@ const Index = () => {
     // Add building logic here
   };
 
+  const handleResourceUpdate = (gathered) => {
+    setResources(prev => ({
+      wood: prev.wood + gathered.wood,
+      stone: prev.stone + gathered.stone,
+      gold: prev.gold + gathered.gold,
+    }));
+  };
+
+  const handleResourcesSpent = (cost) => {
+    setResources(prev => ({
+      wood: prev.wood - cost.wood,
+      stone: prev.stone - cost.stone,
+      gold: prev.gold - cost.gold,
+    }));
+  };
+
   // Weather effect simulation
   useEffect(() => {
     const weatherTypes = ['clear', 'rain', 'fog', 'lightning'];
@@ -125,14 +142,6 @@ const Index = () => {
 
     return () => clearInterval(weatherInterval);
   }, []);
-
-  const handleResourceUpdate = (gathered) => {
-    setResources(prev => ({
-      wood: prev.wood + gathered.wood,
-      stone: prev.stone + gathered.stone,
-      gold: prev.gold + gathered.gold,
-    }));
-  };
 
   if (isLoading) {
     return (
@@ -278,6 +287,10 @@ const Index = () => {
       {/* Game World */}
       <div className="fixed inset-0 z-0 mt-16">
         <ResourceManager onResourceUpdate={handleResourceUpdate} />
+        <BuildingManager 
+          resources={resources}
+          onResourcesSpent={handleResourcesSpent}
+        />
       </div>
 
       {/* Game Background */}
