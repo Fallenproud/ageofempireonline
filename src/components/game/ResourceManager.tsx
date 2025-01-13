@@ -15,12 +15,17 @@ const ResourceManager: React.FC<ResourceManagerProps> = ({ onResourceUpdate }) =
   }>>([]);
 
   useEffect(() => {
-    // Initialize resource nodes
-    const initialNodes = [
-      { id: '1', type: 'wood', position: { x: 100, y: 100 }, amount: 1000 },
-      { id: '2', type: 'wood', position: { x: 300, y: 150 }, amount: 1000 },
-      { id: '3', type: 'stone', position: { x: 200, y: 250 }, amount: 800 },
-      { id: '4', type: 'gold', position: { x: 400, y: 200 }, amount: 500 },
+    // Initialize resource nodes with proper typing
+    const initialNodes: Array<{
+      id: string;
+      type: ResourceType;
+      position: { x: number; y: number };
+      amount: number;
+    }> = [
+      { id: '1', type: 'wood' as ResourceType, position: { x: 100, y: 100 }, amount: 1000 },
+      { id: '2', type: 'wood' as ResourceType, position: { x: 300, y: 150 }, amount: 1000 },
+      { id: '3', type: 'stone' as ResourceType, position: { x: 200, y: 250 }, amount: 800 },
+      { id: '4', type: 'gold' as ResourceType, position: { x: 400, y: 200 }, amount: 500 },
     ];
     setNodes(initialNodes);
   }, []);
