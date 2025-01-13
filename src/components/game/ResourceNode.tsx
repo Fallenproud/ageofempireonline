@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/use-toast";
+import { Progress } from "@/components/ui/progress";
 
 export type ResourceType = 'wood' | 'stone' | 'gold';
 
@@ -19,6 +20,7 @@ const ResourceNode: React.FC<ResourceNodeProps> = ({
 }) => {
   const { toast } = useToast();
   const [isGathering, setIsGathering] = useState(false);
+  const [gatherProgress, setGatherProgress] = useState(0);
 
   const resourceImages = {
     wood: "/lovable-uploads/403d589d-44f6-4d9c-b003-84a5918edb71.png",
@@ -26,21 +28,43 @@ const ResourceNode: React.FC<ResourceNodeProps> = ({
     gold: "/lovable-uploads/f1526835-ab5e-48ea-a317-4bbc731ac04a.png"
   };
 
+  const gatheringTimes = {
+    wood: 2000,
+    stone: 3000,
+    gold: 4000
+  };
+
   const handleGather = () => {
-    if (isGathering) return;
+    if (isGathering || amount <= 0) return;
     
     setIsGathering(true);
-    const gatherAmount = 5; // Base gather amount
-
-    onGather(gatherAmount);
+    setGatherProgress(0);
     
-    toast({
-      title: "Resource Gathered",
-      description: `Gathered ${gatherAmount} ${type}`,
-    });
-
-    // Animation duration matches the CSS animation
-    setTimeout(() => setIsGathering(false), 500);
+    const gatherDuration = gatheringTimes[type];
+    const gatherAmount = 5;
+    
+    // Progress animation
+    const startTime = Date.now();
+    const updateProgress = () => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min((elapsed / gatherDuration) * 100, 100);
+      setGatherProgress(progress);
+      
+      if (progress < 100) {
+        requestAnimationFrame(updateProgress);
+      } else {
+        onGather(gatherAmount);
+        setIsGathering(false);
+        setGatherProgress(0);
+        
+        toast({
+          title: "Resource Gathered",
+          description: `Gathered ${gatherAmount} ${type}`,
+        });
+      }
+    };
+    
+    requestAnimationFrame(updateProgress);
   };
 
   return (
@@ -64,6 +88,11 @@ const ResourceNode: React.FC<ResourceNodeProps> = ({
       <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-sm text-game-accent">
         {amount}
       </div>
+      {isGathering && (
+        <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 w-20">
+          <Progress value={gatherProgress} className="h-1 bg-game-secondary" />
+        </div>
+      )}
     </div>
   );
 };

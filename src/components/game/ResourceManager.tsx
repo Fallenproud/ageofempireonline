@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ResourceNode, { ResourceType } from './ResourceNode';
 import { Card } from "@/components/ui/card";
+import { toast } from "@/components/ui/use-toast";
 
 interface ResourceManagerProps {
   onResourceUpdate: (resources: { wood: number; stone: number; gold: number }) => void;
@@ -35,6 +36,12 @@ const ResourceManager: React.FC<ResourceManagerProps> = ({ onResourceUpdate }) =
       prevNodes.map(node => {
         if (node.id === nodeId) {
           const newAmount = Math.max(0, node.amount - gatheredAmount);
+          if (newAmount === 0) {
+            toast({
+              title: "Resource Depleted",
+              description: `This ${node.type} source has been depleted!`,
+            });
+          }
           return { ...node, amount: newAmount };
         }
         return node;
