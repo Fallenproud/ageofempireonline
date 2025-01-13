@@ -10,11 +10,17 @@ const Index = () => {
   const [buildings, setBuildings] = useState([]);
   const [selectedHero, setSelectedHero] = useState(null);
   const [weather, setWeather] = useState('clear');
+  const [isLoading, setIsLoading] = useState(true);
   const [weatherEffects, setWeatherEffects] = useState({
     moveSpeed: 1,
     attackPower: 1,
     visibility: 1
   });
+
+  // Simulate loading screen
+  useEffect(() => {
+    setTimeout(() => setIsLoading(false), 2000);
+  }, []);
 
   const weatherIcons = {
     clear: {
@@ -119,15 +125,58 @@ const Index = () => {
     return () => clearInterval(weatherInterval);
   }, []);
 
+  if (isLoading) {
+    return (
+      <div className="fixed inset-0 bg-game-secondary flex items-center justify-center flex-col gap-4">
+        <img 
+          src="/lovable-uploads/aad01c13-58d2-4c99-9e7f-3d05893a467d.png" 
+          alt="Age of Empires 2025 Online" 
+          className="w-64 h-64 object-contain animate-pulse"
+        />
+        <div className="text-game-accent text-xl font-bold">Loading your realm...</div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-game-secondary to-game-primary p-4">
+      {/* Game Logo Header */}
+      <div className="fixed top-0 left-0 right-0 bg-game-secondary/90 backdrop-blur p-2">
+        <img 
+          src="/lovable-uploads/aad01c13-58d2-4c99-9e7f-3d05893a467d.png" 
+          alt="Game Logo" 
+          className="h-12 object-contain mx-auto"
+        />
+      </div>
+
       {/* Resources Display */}
-      <div className="fixed top-4 right-4 flex gap-4">
+      <div className="fixed top-16 right-4 flex gap-4">
         <Card className="p-3 bg-opacity-90 backdrop-blur">
-          <div className="flex gap-4 text-game-accent">
-            <div>Wood: {resources.wood}</div>
-            <div>Stone: {resources.stone}</div>
-            <div>Gold: {resources.gold}</div>
+          <div className="flex gap-6 text-game-accent items-center">
+            <div className="flex items-center gap-2">
+              <img 
+                src="/lovable-uploads/403d589d-44f6-4d9c-b003-84a5918edb71.png" 
+                alt="Wood" 
+                className="w-6 h-6 object-contain"
+              />
+              <span>{resources.wood}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <img 
+                src="/lovable-uploads/06f6421b-91d9-4182-ae25-5b9824111e3b.png" 
+                alt="Stone" 
+                className="w-6 h-6 object-contain"
+              />
+              <span>{resources.stone}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <img 
+                src="/lovable-uploads/f1526835-ab5e-48ea-a317-4bbc731ac04a.png" 
+                alt="Gold" 
+                className="w-6 h-6 object-contain"
+              />
+              <span>{resources.gold}</span>
+            </div>
           </div>
         </Card>
       </div>
@@ -165,8 +214,8 @@ const Index = () => {
         </Card>
       </div>
 
-      {/* Hero Selection */}
-      <div className="fixed top-4 left-4">
+      {/* Hero Selection with Updated Images */}
+      <div className="fixed top-32 left-4">
         <Card className="p-4 bg-opacity-90 backdrop-blur">
           <h2 className="text-xl mb-3 text-game-accent">Heroes</h2>
           <div className="flex flex-col gap-2">
