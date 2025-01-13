@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
+import { Cloud, Sun, CloudRain, Zap } from "lucide-react";
 
 const Index = () => {
   const { toast } = useToast();
@@ -9,6 +10,38 @@ const Index = () => {
   const [buildings, setBuildings] = useState([]);
   const [selectedHero, setSelectedHero] = useState(null);
   const [weather, setWeather] = useState('clear');
+  const [weatherEffects, setWeatherEffects] = useState({
+    moveSpeed: 1,
+    attackPower: 1,
+    visibility: 1
+  });
+
+  const weatherIcons = {
+    clear: {
+      icon: Sun,
+      color: "text-yellow-500",
+      label: "Clear",
+      description: "Perfect conditions for gathering and combat"
+    },
+    rain: {
+      icon: CloudRain,
+      color: "text-blue-500",
+      label: "Rain",
+      description: "Reduced movement speed"
+    },
+    fog: {
+      icon: Cloud,
+      color: "text-gray-500",
+      label: "Fog",
+      description: "Limited visibility"
+    },
+    lightning: {
+      icon: Zap,
+      color: "text-amber-500",
+      label: "Lightning Storm",
+      description: "Increased attack power"
+    }
+  };
 
   const heroes = [
     { 
@@ -60,6 +93,32 @@ const Index = () => {
     // Add building logic here
   };
 
+  // Weather effect simulation
+  useEffect(() => {
+    const weatherTypes = ['clear', 'rain', 'fog', 'lightning'];
+    const weatherInterval = setInterval(() => {
+      const newWeather = weatherTypes[Math.floor(Math.random() * weatherTypes.length)];
+      setWeather(newWeather);
+      
+      // Update weather effects
+      const effects = {
+        clear: { moveSpeed: 1, attackPower: 1, visibility: 1 },
+        rain: { moveSpeed: 0.7, attackPower: 0.9, visibility: 0.8 },
+        fog: { moveSpeed: 0.8, attackPower: 0.7, visibility: 0.5 },
+        lightning: { moveSpeed: 1, attackPower: 1.2, visibility: 0.9 }
+      };
+      
+      setWeatherEffects(effects[newWeather]);
+      
+      toast({
+        title: `Weather Changed: ${weatherIcons[newWeather].label}`,
+        description: weatherIcons[newWeather].description,
+      });
+    }, 30000); // Weather changes every 30 seconds
+
+    return () => clearInterval(weatherInterval);
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-game-secondary to-game-primary p-4">
       {/* Resources Display */}
@@ -69,6 +128,39 @@ const Index = () => {
             <div>Wood: {resources.wood}</div>
             <div>Stone: {resources.stone}</div>
             <div>Gold: {resources.gold}</div>
+          </div>
+        </Card>
+      </div>
+
+      {/* Weather Display */}
+      <div className="fixed top-4 left-1/2 -translate-x-1/2">
+        <Card className="p-4 bg-opacity-90 backdrop-blur">
+          <div className="flex flex-col items-center gap-2">
+            <div className="flex items-center gap-2">
+              {React.createElement(weatherIcons[weather].icon, {
+                className: `w-6 h-6 ${weatherIcons[weather].color}`
+              })}
+              <span className="text-game-accent font-semibold">
+                {weatherIcons[weather].label}
+              </span>
+            </div>
+            <div className="text-sm text-muted-foreground">
+              {weatherIcons[weather].description}
+            </div>
+            <div className="grid grid-cols-3 gap-4 text-xs text-game-accent mt-2">
+              <div className="text-center">
+                <div>Move Speed</div>
+                <div>{Math.round(weatherEffects.moveSpeed * 100)}%</div>
+              </div>
+              <div className="text-center">
+                <div>Attack</div>
+                <div>{Math.round(weatherEffects.attackPower * 100)}%</div>
+              </div>
+              <div className="text-center">
+                <div>Visibility</div>
+                <div>{Math.round(weatherEffects.visibility * 100)}%</div>
+              </div>
+            </div>
           </div>
         </Card>
       </div>
@@ -121,15 +213,6 @@ const Index = () => {
                 </div>
               </Button>
             ))}
-          </div>
-        </Card>
-      </div>
-
-      {/* Weather Display */}
-      <div className="fixed top-4 left-1/2 -translate-x-1/2">
-        <Card className="p-3 bg-opacity-90 backdrop-blur">
-          <div className="text-game-accent">
-            Weather: {weather.charAt(0).toUpperCase() + weather.slice(1)}
           </div>
         </Card>
       </div>
