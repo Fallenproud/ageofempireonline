@@ -5,11 +5,11 @@ import { useToast } from "@/components/ui/use-toast";
 import { Cloud, Sun, CloudRain, Zap } from "lucide-react";
 import ResourceManager from '@/components/game/ResourceManager';
 import BuildingManager from '@/components/game/BuildingManager';
+import UnitManager from '@/components/game/UnitManager';
 
 const Index = () => {
   const { toast } = useToast();
   const [resources, setResources] = useState({ wood: 100, stone: 50, gold: 25 });
-  const [buildings, setBuildings] = useState([]);
   const [selectedHero, setSelectedHero] = useState(null);
   const [weather, setWeather] = useState('clear');
   const [isLoading, setIsLoading] = useState(true);
@@ -91,14 +91,6 @@ const Index = () => {
       cost: { wood: 150, stone: 50, gold: 0 },
       image: "/lovable-uploads/f1526835-ab5e-48ea-a317-4bbc731ac04a.png"
     }
-  };
-
-  const constructBuilding = (type) => {
-    toast({
-      title: "Building Started",
-      description: `Construction of ${buildingTypes[type].name} has begun!`,
-    });
-    // Add building logic here
   };
 
   const handleResourceUpdate = (gathered) => {
@@ -232,7 +224,7 @@ const Index = () => {
         </Card>
       </div>
 
-      {/* Hero Selection with Updated Images */}
+      {/* Hero Selection */}
       <div className="fixed top-32 left-4">
         <Card className="p-4 bg-opacity-90 backdrop-blur">
           <h2 className="text-xl mb-3 text-game-accent">Heroes</h2>
@@ -257,37 +249,14 @@ const Index = () => {
         </Card>
       </div>
 
-      {/* Building Menu */}
-      <div className="fixed bottom-4 left-4">
-        <Card className="p-4 bg-opacity-90 backdrop-blur">
-          <h2 className="text-xl mb-3 text-game-accent">Buildings</h2>
-          <div className="grid grid-cols-1 gap-2">
-            {Object.entries(buildingTypes).map(([type, building]) => (
-              <Button
-                key={type}
-                variant="outline"
-                className="w-full flex items-center gap-3"
-                onClick={() => constructBuilding(type)}
-              >
-                <img src={building.image} alt={building.name} className="w-12 h-12 object-contain" />
-                <div className="text-left">
-                  <div>{building.name}</div>
-                  <div className="text-sm opacity-70">
-                    {building.cost.wood > 0 && `${building.cost.wood} wood `}
-                    {building.cost.stone > 0 && `${building.cost.stone} stone `}
-                    {building.cost.gold > 0 && `${building.cost.gold} gold`}
-                  </div>
-                </div>
-              </Button>
-            ))}
-          </div>
-        </Card>
-      </div>
-
       {/* Game World */}
       <div className="fixed inset-0 z-0 mt-16">
         <ResourceManager onResourceUpdate={handleResourceUpdate} />
         <BuildingManager 
+          resources={resources}
+          onResourcesSpent={handleResourcesSpent}
+        />
+        <UnitManager
           resources={resources}
           onResourcesSpent={handleResourcesSpent}
         />
