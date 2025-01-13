@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import Unit, { UnitType } from './Unit';
 import { toast } from "@/components/ui/use-toast";
+import { UnitType } from './Unit';
+import UnitControls from './UnitControls';
+import UnitList from './UnitList';
 
 export const unitCosts = {
   villager: { wood: 0, stone: 0, gold: 50 },
@@ -61,7 +63,6 @@ const UnitManager: React.FC<UnitManagerProps> = ({
     setUnits(prev => [...prev, newUnit]);
     onResourcesSpent(unitCosts[selectedUnitType]);
     
-    // Start training
     const trainingInterval = setInterval(() => {
       setUnits(prev => 
         prev.map(unit => {
@@ -86,33 +87,11 @@ const UnitManager: React.FC<UnitManagerProps> = ({
 
   return (
     <div className="relative w-full h-full" onClick={handleTrainUnit}>
-      <div className="fixed bottom-4 left-4 flex gap-2">
-        {Object.keys(unitCosts).map((type) => (
-          <button
-            key={type}
-            className={`p-2 rounded ${
-              selectedUnitType === type 
-                ? 'bg-game-accent text-white' 
-                : 'bg-game-secondary text-game-accent'
-            }`}
-            onClick={(e) => {
-              e.stopPropagation();
-              setSelectedUnitType(type as UnitType);
-            }}
-          >
-            {type}
-          </button>
-        ))}
-      </div>
-      {units.map(unit => (
-        <Unit
-          key={unit.id}
-          type={unit.type}
-          position={unit.position}
-          health={unit.health}
-          trainingProgress={unit.trainingProgress}
-        />
-      ))}
+      <UnitList units={units} />
+      <UnitControls
+        selectedUnitType={selectedUnitType}
+        onUnitSelect={setSelectedUnitType}
+      />
     </div>
   );
 };
