@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { Cloud, Sun, CloudRain, Zap } from "lucide-react";
+import ResourceManager from '@/components/game/ResourceManager';
 
 const Index = () => {
   const { toast } = useToast();
@@ -124,6 +125,14 @@ const Index = () => {
 
     return () => clearInterval(weatherInterval);
   }, []);
+
+  const handleResourceUpdate = (gathered) => {
+    setResources(prev => ({
+      wood: prev.wood + gathered.wood,
+      stone: prev.stone + gathered.stone,
+      gold: prev.gold + gathered.gold,
+    }));
+  };
 
   if (isLoading) {
     return (
@@ -264,6 +273,11 @@ const Index = () => {
             ))}
           </div>
         </Card>
+      </div>
+
+      {/* Game World */}
+      <div className="fixed inset-0 z-0 mt-16">
+        <ResourceManager onResourceUpdate={handleResourceUpdate} />
       </div>
 
       {/* Game Background */}
