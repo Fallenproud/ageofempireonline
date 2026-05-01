@@ -1,6 +1,8 @@
 import React from 'react';
 import { Card } from "@/components/ui/card";
-import { Sun, Cloud, CloudRain, Zap } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Sun, Cloud, CloudRain, Zap, LogOut } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 interface WeatherEffects {
   moveSpeed: number;
@@ -22,14 +24,28 @@ interface WeatherProps {
 }
 
 const GameHeader: React.FC<WeatherProps> = ({ weather, weatherEffects, weatherIcons }) => {
+  const { user, signOut } = useAuth();
   return (
     <>
-      <div className="fixed top-0 left-0 right-0 bg-game-secondary/90 backdrop-blur p-2">
+      <div className="fixed top-0 left-0 right-0 bg-game-secondary/90 backdrop-blur p-2 flex items-center justify-between z-50">
+        <div className="w-32" />
         <img 
           src="/lovable-uploads/aad01c13-58d2-4c99-9e7f-3d05893a467d.png" 
           alt="Game Logo" 
-          className="h-12 object-contain mx-auto"
+          className="h-12 object-contain"
         />
+        <div className="w-32 flex justify-end items-center gap-2">
+          {user && (
+            <>
+              <span className="text-game-accent text-sm hidden sm:inline">
+                {user.email?.split('@')[0]}
+              </span>
+              <Button size="sm" variant="ghost" onClick={signOut}>
+                <LogOut className="w-4 h-4" />
+              </Button>
+            </>
+          )}
+        </div>
       </div>
 
       <div className="fixed top-4 left-1/2 -translate-x-1/2">
