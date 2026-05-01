@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { lovable } from '@/integrations/lovable';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/components/ui/use-toast';
+import { Separator } from '@/components/ui/separator';
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -52,6 +54,20 @@ const Auth = () => {
       toast({ title: 'Welcome!', description: 'Account created. Signing you in...' });
       navigate('/', { replace: true });
     }
+  };
+
+  const handleAppleSignIn = async () => {
+    setBusy(true);
+    const result = await lovable.auth.signInWithOAuth('apple', {
+      redirect_uri: window.location.origin,
+    });
+    if (result.error) {
+      setBusy(false);
+      toast({ title: 'Apple sign in failed', description: result.error.message, variant: 'destructive' });
+      return;
+    }
+    if (result.redirected) return;
+    navigate('/', { replace: true });
   };
 
   return (
@@ -102,6 +118,26 @@ const Auth = () => {
               </form>
             </TabsContent>
           </Tabs>
+
+          <div className="relative my-6">
+            <Separator />
+            <span className="absolute left-1/2 -translate-x-1/2 -top-2.5 bg-card px-2 text-xs text-muted-foreground">
+              OR
+            </span>
+          </div>
+
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full bg-black text-white hover:bg-black/90 hover:text-white border-black"
+            onClick={handleAppleSignIn}
+            disabled={busy}
+          >
+            <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
+            </svg>
+            Sign in with Apple
+          </Button>
         </CardContent>
       </Card>
     </div>
